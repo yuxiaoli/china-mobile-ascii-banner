@@ -1,0 +1,1 @@
+{"name":"china-mobile-ascii-flow","private":true,"type":"module","scripts":{"test":"node --check app.js && node --check renderer.js && node tests/renderer.test.mjs && node tests/motion.test.mjs && node tests/app.test.mjs"}}
