@@ -4,23 +4,36 @@
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
  <meta name="theme-color" content="#ffffff">
- <meta name="description" content="蓝绿 ASCII 字符在白色背景上缓缓流动，逐渐汇聚成中国移动图形标志。">
- <title>中国移动 · ASCII Flow</title>
+ <meta name="description" content="蓝绿 ASCII 字符在白色背景上自由流动，逐渐形成中国移动图形标志与香港创新院字形。">
+ <title>中国移动香港创新院 — ASCII Flow</title>
  <link rel="icon" href="./assets/china-mobile-logo.svg" type="image/svg+xml">
  <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
- <main class="scene" id="scene" aria-label="中国移动图形标志 ASCII 动效">
-  <h1 class="sr-only">中国移动</h1>
+ <main class="scene" id="scene" aria-label="中国移动香港创新院 ASCII 动效">
+  <h1 class="sr-only">中国移动香港创新院</h1>
   <canvas id="field" aria-hidden="true"></canvas>
-  <img class="fallback" src="./assets/china-mobile-logo.svg" alt="中国移动图形标志">
-  <div class="controls" role="group" aria-label="动画控制" aria-describedby="status">
-   <button id="motion" type="button" aria-pressed="true" aria-label="关闭动效" title="切换静态画面"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 10V6m4 7V3m4 11V2m4 9V5"/></svg><span class="motion-label">动效</span><span class="motion-state">开</span></button>
-   <button id="pause" type="button" aria-label="暂停动画"><svg viewBox="0 0 16 16" aria-hidden="true"><path class="pause-shape" d="M5 3v10M11 3v10"/><path class="play-shape" d="m5 3 7 5-7 5Z"/></svg><span>暂停</span></button>
-   <button id="replay" type="button" aria-label="重播渐显动画"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6a5 5 0 1 1 .5 5M3 2v4h4"/></svg><span>重播</span></button>
+  <div class="fallback" role="img" aria-label="中国移动香港创新院">
+   <img class="fallback-logo" src="./assets/china-mobile-logo.svg" alt="" aria-hidden="true">
+   <img class="fallback-lettering" src="./assets/hk-innovation-lettering.svg" alt="" aria-hidden="true">
   </div>
-  <p class="motion-status" id="status" role="status" aria-live="polite">正在加载动画。</p>
+  <div class="motion-panel">
+   <p class="motion-status" id="status" role="status" aria-live="polite">正在加载动画。</p>
+   <div class="controls" role="group" aria-label="动画控制" aria-describedby="status">
+    <div class="timing-controls">
+     <div class="timing-control"><label for="flow-speed">流动速度 <output id="flow-value" for="flow-speed">1.00×</output></label><input id="flow-speed" type="range" min="0.25" max="2" step="0.05" value="1" aria-describedby="timing-help"></div>
+     <div class="timing-control"><label for="formation-duration">总成形时间 <output id="duration-value" for="formation-duration">45秒</output></label><input id="formation-duration" type="range" min="30" max="60" step="1" value="45" aria-describedby="timing-help"></div>
+    </div>
+    <div class="control-buttons">
+     <button id="motion" type="button" aria-pressed="true" aria-label="关闭动效" title="切换静态画面"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 10V6m4 7V3m4 11V2m4 9V5"/></svg><span class="motion-label">动效</span><span class="motion-state">开</span></button>
+     <button id="pause" type="button" aria-label="暂停动画"><svg viewBox="0 0 16 16" aria-hidden="true"><path class="pause-shape" d="M5 3v10M11 3v10"/><path class="play-shape" d="m5 3 7 5-7 5Z"/></svg><span>暂停</span></button>
+     <button id="replay" type="button" aria-label="重播完整成形过程"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6a5 5 0 1 1 .5 5M3 2v4h4"/></svg><span>重播</span></button>
+    </div>
+    <p class="timing-help" id="timing-help">包含10秒开场。调整后保留进度；重播将重新开始完整周期。</p>
+   </div>
+  </div>
  </main>
+ <noscript><style>.motion-panel{display:none}</style></noscript>
  <script type="module" src="./app.js"></script>
 </body>
 </html>
