@@ -27,7 +27,7 @@ function createHarness(width = 390, height = 844, options = {}) {
   const context = {
     setTransform() {}, drawImage() {}, fillRect() { draws = []; fontStage = 0; },
     set font(value) { this.fontValue = value; fontStage++; }, get font() { return this.fontValue; },
-    fillText(char, x, y) { draws.push({ char, x, y, alpha: this.globalAlpha, color: this.fillStyle, fontStage }); }
+    fillText(char, x, y) { draws.push({ char, x, y, alpha: this.globalAlpha, color: this.fillStyle, font: this.font, fontStage }); }
   };
   const canvas = { getContext: () => context, getBoundingClientRect: () => ({ width, height, left: 0, top: 0 }), parentElement: { addEventListener() {}, removeEventListener() {} } };
   const field = new renderer.AsciiField(canvas, { logoPixels, textPixels, ...options });
@@ -283,4 +283,25 @@ test('pause and hidden clocks freeze both integrators while reduced motion stays
   field.setFlowSpeed(.25); field.setTotalDuration(60); assert.deepEqual(harness.capture(), still, 'reduced settings do not animate or alter the exact completed source artwork');
   const time = field.time; field.replay(); field.tick(30000); assert.equal(field.time, time); assert.deepEqual(harness.capture(900), still);
   assert.equal(harness.callbacks.size, 0); field.destroy();
+});
+
+
+test('source-derived foreground uses larger bold glyphs while retaining individual particle spacing', () => {
+  for (const [width, height] of [[1440, 900], [390, 844], [320, 568]]) {
+    const harness = createHarness(width, height), { field } = harness;
+    for (const phase of [6, 25, 45]) {
+      const calls = harness.capture(phase).filter(call => call.fontStage >= 2);
+      assert.ok(calls.length > 1000);
+      assert.ok(calls.every(call => /^700 [\d.]+px /.test(call.font)), 'every logo and lettering paint uses real bold type');
+    }
+    for (const point of field.title) {
+      const mobile = width <= 700;
+      const expected = point.part === 'logo' ? (mobile ? 6.2 : 7.4) : (mobile ? 3.9 : 5.3);
+      const stepX = point.part === 'logo' ? (mobile ? 3.5 : 4.2) : (mobile ? 2.5 : 3.2);
+      assert.equal(point.fontSize, expected, 'foreground ink size is explicit for each responsive layer');
+      assert.ok(point.fontSize * .61 < stepX * 1.1, 'monospace advance stays close to the unchanged sample grid');
+      assert.ok(point.fontSize < 8, 'source trajectory margins remain unchanged');
+    }
+    field.destroy();
+  }
 });

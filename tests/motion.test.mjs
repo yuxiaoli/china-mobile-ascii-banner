@@ -11,7 +11,7 @@ for (let y = 180; y < 265; y++) for (let x = 180; x < 269; x++) {
 }
 let nextId = 1, callbacks = new Map(), dimensions = { width: 1440, height: 900 };
 const listeners = {};
-let samples = new Map(), backgroundCells = new Map(), backgroundGlyphs = new Map();
+let samples = new Map(), backgroundCells = new Map(), backgroundGlyphs = new Map(), fontStage = 0;
 let backgroundId = -1, previousAnchor = null;
 globalThis.requestAnimationFrame = fn => { const id = nextId++; callbacks.set(id, fn); return id; };
 globalThis.cancelAnimationFrame = id => callbacks.delete(id);
@@ -24,15 +24,16 @@ globalThis.document = {
 globalThis.ResizeObserver = class { observe() {} disconnect() {} };
 globalThis.IntersectionObserver = class { constructor(fn) { this.fn = fn; } observe() {} disconnect() {} };
 const context = {
-  setTransform() {}, fillRect() {}, drawImage() {},
+  setTransform() {}, fillRect() { fontStage = 0; }, drawImage() {},
+  set font(value) { this.fontValue = value; fontStage++; }, get font() { return this.fontValue; },
   fillText(char, x, y) {
     assert.ok(Number.isFinite(x) && Number.isFinite(y));
     assert.equal(char.length, 1);
     const key = [char, x, y].join('|'), alpha = this.globalAlpha ?? 1;
     samples.set(key, (samples.get(key) || 0) + alpha);
-    // Both stages use centered text. Background font is at least 8.05px;
-    // logo font is 5.3px on mobile or 6.3px on desktop.
-    if (parseFloat(this.font) > 7) {
+    // Classify by the actual paint layer, not font size or numeric weight.
+    // Foreground glyphs may be bold and larger without becoming background.
+    if (fontStage === 1) {
       if(!previousAnchor||previousAnchor.x!==x||previousAnchor.y!==y)backgroundId++;
       previousAnchor={x,y};
       const cell = String(backgroundId), identity = [backgroundId,char].join('|');

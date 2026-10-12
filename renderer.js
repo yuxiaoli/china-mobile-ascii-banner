@@ -121,11 +121,13 @@ export class AsciiField {
   const layout=compositionLayoutAt({width:this.width,height:this.height},logoPixels,textPixels);
   this.parts=layout.parts;this.compositionBounds=layout.bounds;this.logoBounds={width:layout.bounds.width,height:layout.bounds.height};
   this.cx=layout.bounds.x+layout.bounds.width/2;this.cy=layout.bounds.y+layout.bounds.height/2;
-  this.title=[];this.titleFont=this.mobile?5.3:6.3;
+  // Give source-derived foreground glyphs enough ink to read clearly on white.
+  // Keep the sample grid and particle paths unchanged so the artwork stays precise.
+  this.title=[];this.titleFont=this.mobile?6.2:7.4;
   for(const part of ['logo','lettering']){
    const pixels=part==='logo'?logoPixels:textPixels,rect=layout.parts[part],scale=rect.width/pixels.width;
    const stepX=part==='logo'?(this.mobile?3.5:4.2):(this.mobile?2.5:3.2),stepY=part==='logo'?(this.mobile?5:6):(this.mobile?3.5:4.4);
-   const fontSize=part==='logo'?this.titleFont:(this.mobile?3:4.2);
+   const fontSize=part==='logo'?this.titleFont:(this.mobile?3.9:5.3);
    for(let y=stepY/2;y<rect.height;y+=stepY)for(let x=stepX/2;x<rect.width;x+=stepX){
     const sourceX=x/scale,sourceY=y/scale,region=regionAt(pixels,sourceX,sourceY);if(!region)continue;
     const px=rect.x+x,py=rect.y+y,nx=(px-this.cx)/(layout.bounds.width/2),ny=(py-this.cy)/(layout.bounds.height/2);
@@ -196,12 +198,12 @@ export class AsciiField {
    c.globalAlpha=alpha*(1-glyph.blend);c.fillText(glyph.from,pose.x,pose.y);
    if(glyph.blend>0){c.globalAlpha=alpha*glyph.blend;c.fillText(glyph.to,pose.x,pose.y)}
   }
-  c.font=`${this.titleFont}px "SFMono-Regular",Consolas,"Liberation Mono",monospace`;c.textAlign='center';c.textBaseline='middle';
+  c.font=`700 ${this.titleFont}px "SFMono-Regular",Consolas,"Liberation Mono",monospace`;c.textAlign='center';c.textBaseline='middle';
   const titleViewport={width:w,height:h,fontSize:this.titleFont,flowSeconds,formationProgress:progress};
   let paintFont=this.titleFont;
   for(let id=0;id<this.title.length;id++){
    const p=this.title[id],font=p.fontSize??this.titleFont;
-   if(font!==paintFont){c.font=`${font}px "SFMono-Regular",Consolas,"Liberation Mono",monospace`;paintFont=font}
+   if(font!==paintFont){c.font=`700 ${font}px "SFMono-Regular",Consolas,"Liberation Mono",monospace`;paintFont=font}
    titleViewport.fontSize=font;
    const pose=this.reduced?{x:p.x,y:p.y,settle:1}:particlePoseAt(id,p,titleViewport,t,this.options),local=pose.settle;
    c.fillStyle=p.color;
